@@ -1,4 +1,4 @@
-# WOMBAT
+# WOMBAT, la yincana científica
 
 ![LOGO](IMG_2281.png)
 Tras años de investigaciones , aún se desconoce el origen del wombat, ayuda a resolver problemas de laboratorio y consigue conocer a fondo a este marsupial australiano.
