@@ -1,6 +1,6 @@
 # [Título del trabajo]
 
-Se trata de una yincana matemática, para comenzar debes introducir tu usuario y contraseña, a partir de ahi comenzaran ha aparecer preguntas matemáticas que irán aumentando el nivel, de básico a difícil. Al terminar obtendras tu puntuación, la cual podrás compararla con la de tus amigos.
+Se trata de una yincana matemática, para comenzar debes introducir tu usuario y contraseña, a partir de ahi comenzaran a aparecer preguntas matemáticas que irán aumentando de nivel, desde uno básico a otros más difíciles. Al terminar obtendrás tu puntuación, la cual podrás comparar con la de tus amigos.
 
 ## Integrantes del equipo
 
