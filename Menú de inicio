@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+int main () {
+	
+	int nombreusuario, contrasena;
+	
+	printf("Introduce tu nombre de usuario:");
+	scanf("%c", &nombreusuario);
+  
+	printf("Introduce la contrasena:");
+	scanf("%c", &contrasena);
+	
+	if (nombreusuario == 1) {
+		printf("Usuario correcto\n");
+	} else if(contrasena == 1) {
+		printf("Contrasena correcta\n");
+	}
+	printf("\n");
+	printf("Bienvenido al menu de WOMBAT \n");
+	printf("Aqui podras poner a prueba tu capacidad matematica y compararla con la de tus amigos :) \n");
+	printf(" \n");
+	printf("Iniciar partida \n");
+	
+	return 0;
+	
+}
