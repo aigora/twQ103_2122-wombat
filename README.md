@@ -1,5 +1,7 @@
-# [Título del trabajo]
+# WOMBAT
 
+![LOGO]()
+Tras años de investigaciones , aún se desconoce el origen del wombat, ayuda a resolver problemas de laboratorio y consigue conocer a fondo a este marsupial australiano.
 Se trata de una yincana matemática, para comenzar debes introducir tu usuario y contraseña, a partir de ahi comenzaran a aparecer preguntas matemáticas que irán aumentando de nivel, desde uno básico a otros más difíciles. Al terminar obtendrás tu puntuación, la cual podrás comparar con la de tus amigos.
 
 ## Integrantes del equipo
