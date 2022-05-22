@@ -2,25 +2,49 @@
 
 int main () {
 	
-	int nombreusuario, contrasena;
+	char opcion, jugador1, jugador2, numero1, numero2, numeroJugadores; 
 	
-	printf("Introduce tu nombre de usuario:");
-	scanf("%c", &nombreusuario);
-  
-	printf("Introduce la contrasena:");
-	scanf("%c", &contrasena);
 	
-	if (nombreusuario == 1) {
-		printf("Usuario correcto\n");
-	} else if(contrasena == 1) {
-		printf("Contrasena correcta\n");
-	}
-	printf("\n");
-	printf("Bienvenido al menu de WOMBAT \n");
-	printf("Aqui podras poner a prueba tu capacidad matematica y compararla con la de tus amigos :) \n");
-	printf(" \n");
-	printf("Iniciar partida \n");
+	do {
+		printf("BIENVENIDO AL MENU DE WOMBAT \n");
+		printf("Aqui podras poner a prueba tu capacidad matematica y compararla con la de tus amigos :) \n");
+		printf("\n");
+		printf("Introduzca el numero de jugadores:\n");
+		scanf("%c", &numeroJugadores);
+		printf("\n");
+		
+		if (numeroJugadores == 1) {
+			printf("Jugador.1 introduzca su nombre de usuario:\n");
+			fflush(stdin);
+			scanf("%c",&jugador1);
+			printf("\n");
+		}
+		else if (numeroJugadores == 2){
+			printf("Jugador.1 introduzca su nombre de usuario:\n");
+			fflush(stdin);
+			scanf("%c",&jugador1);
+			printf("\n");
+			
+			printf("Jugador.2 introduzca su nombre de usuario:\n");
+			fflush ( stdin );
+			scanf("%c",&jugador2);
+			printf("\n");
+		}
+		
+		printf("Jugador.1 introduzca su nombre de usuario:\n");
+		fflush(stdin);
+		scanf("%c",&jugador1);
+		printf("\n");
+			
+		printf("Jugador.2 introduzca su nombre de usuario:\n");
+		fflush ( stdin );
+		scanf("%c",&jugador2);
+		printf("\n");
+	} while (jugador1 == 1 && jugador2 == 1);
+	
+	printf("Inicia la partida\n");
+
 	
 	return 0;
-	
+		
 }
