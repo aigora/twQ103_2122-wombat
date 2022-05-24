@@ -63,12 +63,13 @@ int main(){
 	    switch (opcion) {
 		    case 'R' :  // REGLAS
 		        printf("Reglas del juego.\n");
-		        printf("\n");
-			    printf("Bienvenido a Wombat.\n");
-			    printf("\n");
-			    printf("\n ");
-			    printf("\n");
-				printf("\n ");
+		        printf("Para inciar tu partida en WOMBAT YINCANA, debes regristrarte o iniciar sesion si ya tienes una cuenta.\n");
+			    printf("El juego consta de 5 pruebas divididas en 5 preguntas cada una.\n");
+			    printf("A medida que vayas respondiendo correctamente cada pregunta, se iran sumando tus puntos.\n");
+			    printf("Las cuatro primeras preguntas tienen un valor de 5 puntos y la ultima de 10.\n");
+			    printf("Para poder continuar con las siguientes pruebas, debes acumular un total minimo de 10 puntos.\n");
+				printf("\n");
+				printf("MUCHA SUERTE Y QUE COMIENCE EL JUEGO!\n ");
 			    
 		    case 'U' :
 		    	// USUARIO Y CONTRASEÑA
