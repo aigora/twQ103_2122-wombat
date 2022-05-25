@@ -85,6 +85,7 @@ int main(){
 	int longitud1,numero, contador=0, imprimirMenu,opcion,salir_del_juego,salir_al_menu, R, U, S;
 	int num_jugadores,i,q,zor;
 	
+		system ("color e0");
 	
 	struct jugador PLAYER[4];
 	
