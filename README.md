@@ -12,3 +12,5 @@ Se trata de una yincana matemática, para comenzar debes introducir tu usuario y
 
 ## Objetivos del trabajo
 El principal objetivo, es convertir las matemáticas en un pasatiempos entretenido, con este trabajo se podrá aprender, divertirse y trabajar la mente.
+Además de ser un pasatiempos entretenido también puede emplearse como forma de aprendizaje más dinámica en las escuelas.
+
