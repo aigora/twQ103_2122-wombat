@@ -845,6 +845,14 @@ int main(){
 			break;
 		}
 	}
+	
+	if(contador>=10) {
+		printf("Enhorabuena, has completado la yincana Wombat\n");
+	} else if (contador<10){
+		printf("Lo sentimos, no has conseguido superar la yincana, ¡prueba otra vez!\n");
+	}
+	
+	
 }
 	
 	
@@ -854,5 +862,6 @@ int main(){
 	
 	
 	return 0;
-	
+}
+
 }
