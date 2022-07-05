@@ -4,35 +4,64 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <locale.h>
+#include <conio.h>
 
-#define BUFFER_LEN 1024
-#define NUM_PREGUNTAS 20
+#define MAX 80
+#define ARCHIVO_USUARIOS "usuarios.dat"
+#define TECLA_ENTER 13
+#define TECLA_BACKSPACE 8
+#define LONGITUD 5
+#define MAX_INTENTOS 3
 
-//INTRODUCIMOS UNA ESTRUCTURA QUE ALMACENA DATOS DEL USUARIO
 
-struct jugador {
-	char nombre_jugador[50];
-	char contrasena_jugador[50];
+
+struct jugador{
+	
+	char nombre_jugador[MAX];
 	int puntuacionjugador;
 	int dificultad;
 	int pregunta_actual;
 };
-//INTRODUCIMOS LA FUNCION DIFICULTAD
 
-int dificultad(){
-	
-	int opcion2;
-	printf("Indique el nivel de dificultad que desea en su partida\n");
-	printf("\n");
-	printf("1.Facil\n2.Dificil\n");
-	fflush(stdin);
-	scanf("%d", &opcion2);
-	
-    return opcion2;
+
+/* Estructura de cuentas de usuario */
+struct usuario {
+	char nombre[MAX];
+	char password[MAX];
+};
+
+typedef struct usuario Usuario;
+
+/* Funciones de menú */
+void menuInicial();
+void menuListarUsuarios();
+void menuRegistrarUsuario();
+void menuIniciarSesion();
+void menuSistema();
+void reglas();
+
+/* Funciones que manipulan el archivo de usuarios */
+char insertarUsuario(Usuario usuario);
+char existeUsuario(char nombreUsuario[], Usuario *usuario);
+Usuario *obtenerUsuarios(int *);
+char logear(char nombreUsuario[], char password[]);
+
+int leerLinea(char *cad, int n);
+void leerClave(char *password);
+
+void datoswombat();
+void preguntas_facil(int pregunta_actual);
+int respuestas_facil(int numero_pregunta,int respuesta_jugador);
+void preguntas_dificil(int pregunta_actual);
+int respuestas_dificil(int numero_pregunta, int respuesta_jugador);
+
+char linea[MAX];
+
+
+int main() {
+	menuInicial();
+	return 0;
 }
-
-
-//INTRODUCIMOS LA FUNCION PARA IMPRIMIR LAS REGLAS
 
 void reglas(){
 			printf("\n");
@@ -47,26 +76,214 @@ void reglas(){
 			printf("MUCHA SUERTE Y QUE COMIENCE EL JUEGO!\n ");
 			printf("\n");
 			printf("\n");
-			printf("Pulsa cualquier caracter para volver al menu:\n ");
-			printf("\n");
-			printf("\n");
 	
 }
 
-//INTRODUCIMOS LA FUNCION DEL BANNER PRINCIPAL
-
-/*void banner(){
-	printf("--------------------------------------------------*\n");
-	char banner[]={"----{ WOMBAT YINCANA }------{ WOMBAT YINCANA }-----{ WOMBAT YINCANA }----"};
-	unsigned short longitud, indice, espacio, repite, resto;
+void menuInicial() {
 	
+	setlocale(LC_CTYPE,"Spanish");//CODIFICAMOS EL IDIOMA A ESPAÑOL PARA PODER UTILIZAR LETRAS COMO LA Ñ DE ESPAÑA
+	
+	Usuario usuario;
+	char repite = 1;
+	int opcion = -1;
+	int farandul;
+	farandul=1;
+	system ("color e0");//CODIFICAMOS EL COLOR: AMARILLO PARA EL FONDO Y EL NEGRO PARA LAS LETRAS
+
+	
+	do {
+		system("cls");
+		
+		if(farandul==1){
+			banner();
+		}else{
+		banner_fijo();
+		}
+				
+		printf("\t\t\tMENU PRINCIPAL\n");
+		printf("\n\t\t[1]. Ver jugadores registrados\n");
+		printf("\t\t[2]. Registrar jugador nuevo\n");
+		printf("\t\t[3]. Jugar\n");
+		printf("\t\t[4]. Reglas del juego\n");
+		printf("\t\t[5]. A cerca de los WOMBAT\n");
+		printf("\t\t[0]. Salir\n");
+		printf("\n\t\tIngrese su opcion: [ ]\b\b");
+		leerLinea(linea, MAX);
+		sscanf(linea, "%d", &opcion);
+		farandul++;
+
+		switch (opcion) {
+			case 1:
+				system("cls");		
+				banner_fijo();
+				menuListarUsuarios();
+				farandul++;
+				break;
+
+			case 2:
+				system("cls");		
+				banner_fijo();
+				menuRegistrarUsuario();
+				farandul++;
+				break;
+
+			case 3:
+				system("cls");		
+				banner_fijo();
+				menuIniciarSesion();
+				farandul++;
+				break;
+
+			case 4:
+				system("cls");		
+				banner_fijo();
+				reglas();
+				system("pause");
+				break;
+				
+			case 5:
+				system("cls");		
+				banner_fijo();
+				datoswombat();
+				system("pause");
+				farandul++;
+				break;
+				
+			case 0:
+				system("cls");		
+				banner_fijo();
+				printf("HASTA PRONTO!!\n");
+				repite = 0;
+				break;
+		}
+
+	} while (repite == 1);
+}
+
+void menuRegistrarUsuario() {
+	Usuario usuario;
+	char nombreUsuario[MAX];
+	char respuesta[MAX];
+	char repite = 1;
+	
+	do {
+		system("cls");
+		printf("\n\t\t\tREGISTRAR JUGADOR\n");
+		printf("\t\t\t=================\n");
+		printf("\n\tIngrese nombre de usuario: ");
+		leerLinea(linea, MAX);
+		sscanf(linea, "%s", nombreUsuario);
+
+		/* Se verifica que el nombre de usuario no exista */
+		if (!existeUsuario(nombreUsuario, &usuario)) {
+			strcpy(usuario.nombre, nombreUsuario);
+
+			printf("\tIngrese la clave: ");
+			leerLinea(usuario.password, MAX);
+
+			/* Se inserta el usuario en el archivo de usuarios */
+			if (insertarUsuario(usuario)) {
+				printf("\n\tEl jugador fue registrado satisfactoriamente!\n");
+
+			} else {
+				printf("\n\tOcurrio un error al registrar el jugador\n");
+				printf("\nInténtelo mas tarde\n");
+			}
+		} else {
+			printf("\n\tEl usuario \"%s\" ya ha sido registrado previamente\n", usuario.nombre);
+			printf("\tNo puede registrar dos usuarios con el mismo nombre de usuario.\n");
+		}
+
+		printf("\n\tDesea seguir registrando usuarios? [S/N]: ");
+		leerLinea(respuesta, MAX);
+ 
+		if (!(strcmp(respuesta, "S") == 0 || strcmp(respuesta, "s") == 0)) {
+			repite = 0;
+		}
+
+	} while (repite == 1);
+}
+
+void menuListarUsuarios() {
+	int numeroUsuarios;
+	Usuario *usuarios;
+	int i;
+
+	system("cls");
+	usuarios = obtenerUsuarios(&numeroUsuarios); /* Retorna un vector dinámico de usuarios */
+
+	if (numeroUsuarios == 0) {
+		printf("\n\tNo existe ningun usuario registrado!\n");
+
+	} else {
+		printf("\n\t\t    ==> LISTADO DE JUGADORES <==\n");
+		printf(" ------------------------------------------------------------------------------\n");
+		printf("%10s%25s%25s\n", "#", "NOMBRE", "CONTRASEÑA");
+		printf(" ------------------------------------------------------------------------------\n");
+
+		/* Se recorre el vector dinámico de productos */
+		for (i = 0; i < numeroUsuarios; i++) {
+			printf("%10d%25s%25s\n", (i + 1), usuarios[i].nombre, usuarios[i].password);
+		}
+		printf(" ------------------------------------------------------------------------------\n");
+	}
+
+	// Se libera la memoria asignada al vector dinámico
+	free(usuarios);
+	usuarios = NULL;
+	getchar();
+}
+
+void menuIniciarSesion() {
+	
+	
+	char nombreUsuario[MAX];
+	char password[MAX];
+	int intento = 0;
+	int loginExitoso = 0;
+
+	do {
+		system("cls");
+		printf("\n\t\t\tINGRESAR AL SISTEMA\n");
+		printf("\t\t\t===================\n");
+
+		printf("\n\t\tUSUARIO: ");
+		leerLinea(linea, MAX);
+		sscanf(linea, "%s", nombreUsuario);
+
+		printf("\t\tCLAVE: ");
+		leerClave(password);
+		
+		if (logear(nombreUsuario, password)) {
+			loginExitoso = 1;
+		} else {
+			printf("\n\n\t\tUsuario y/o password incorrectos");
+			intento++;
+			getchar();
+		}
+	} while (intento < MAX_INTENTOS && loginExitoso == 0);
+
+	if (loginExitoso == 1) {
+		menuSistema();
+		
+	} else {
+		printf("\n\tHa sobrepasado el numero maximo de intentos permitidos\n");
+		getchar();
+	}
+}
+
+int banner(){
+	printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
+	char banner[]={"*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*{ WOMBAT YINCANA }-*-*-*-*"};
+	unsigned short longitud, indice, espacio, repite, resto;
+
 	//A CONTINUACION SE PROGRAMA EL BANNER
  
 	longitud=strlen(banner);
 	for (repite=1; repite<=2; repite++) /* repite el proceso 3 veces */
-//	{
-		// * IMPRIME EN ORDEN DE IZQUIERDA A DERECHA Y LUEGO DESPLAZA * 
-	/*	for(resto=0; resto<=longitud; resto++) // para caracteres restantes a imprimir 
+	{
+		// ******** IMPRIME EN ORDEN DE IZQUIERDA A DERECHA Y LUEGO DESPLAZA ******** 
+		for(resto=0; resto<=longitud; resto++) // para caracteres restantes a imprimir 
 		{	for (indice=0; indice<=longitud-1-resto; indice++) // seleccion de indices evitando restantes 
 			{
 				printf("%c", banner[indice]); // imprime indice 
@@ -82,106 +299,242 @@ void reglas(){
 		for(espacio=1; espacio<=longitud; espacio++) // borra todos los caracteres presentados 
 			printf("\b\b ");
 		printf("\b"); // se coloca al inicio del desplegado
-	}*/
-/*	printf("----{ WOMBAT YINCANA }------{ WOMBAT YINCANA }-----{ WOMBAT YINCANA }----\n");
-	printf("--------------------------------------------------*\n");
+	}
+	printf("*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*{ WOMBAT YINCANA }-*-*-*-*\n");
+	printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
 	
-}*/
+}
 
 //INTRODUCIMOS LA FUNCIÓN DE UN BANNER FIJO 
 
-void banner_fijo(){
-	printf("--------------------------------------------------*\n");
-	printf("-------{ WOMBAT YINCANA }------{ WOMBAT YINCANA }-----{ WOMBAT YINCANA }------*\n");
-	printf("--------------------------------------------------*\n");
+int banner_fijo(){
+	printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
+	printf("*-*-*-*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*-{ WOMBAT YINCANA }-*-*-*-*-*{ WOMBAT YINCANA }-*-*-*-*-*-*\n");
+	printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
 	
 }
 
-void preguntas_facil(int pregunta_actual){
+//INTRODUCIMOS LA FUNCION PARA EL VIDEOJUEGO
+
+void menuSistema() {
 	
-	switch(pregunta_actual){
-		case 1:{
-			printf("Escribe MMXXVI en números naturales:");
-			break;
-		}
-		case 2:{
-			printf("La raiz de 15625 es:");
-			break;
-		}
-		case 3:{
-			printf("Halla el valor de x=3(14+12-20):(9+3)x:");
-			break;
-		}
-		case 4:{
-			printf("Realiza la siguiente operación: 4/3 - 5/6:");
-			break;
-		}
-		case 5:{
-			printf("¿Cuál de las siguientes es una suma y resta de monomios: 1)2xy-2x+2y, 2) 2+2, 3)3x+4:");
-			break;
-		}	
-		case 6:{
-			printf("Resuelve esta ecuación: (x+28) + 15 = 2(x+15):");
-			break;
-		}	
-		case 7:{
-			printf("Cambia las unidades a m^2: 1005km^2 :");
-			break;
-		}	
-		case 8:{
-			printf("¿Cuántas botellas de vino de un litro de capacidad se pueden llenar con un tonel de un hectolitro?:");
-			break;
-		}	
-		case 9:{
-			printf("El 60% del cuerpo humano es agua. ¿Qué litros de agua hay en una persona de 75 kg?:");
-			break;
-		}	
-		case 10:{
-			printf("Expresa en segundos 2° 3' 40:");
-			break;
-		}	
-		case 11:{
-			printf("Obtén el ángulo el suplementario de 75º:");
-			break;
-		}	
-		case 12:{
-			printf("¿Cuantos lados tiene un hexagono?:");
-			break;
-		}	
-		case 13:{
-			printf("En un triángulo rectángulo, un ángulo mide 30°. ¿Cuánto mide el tercer ángulo?:");
-			break;
-		}	
-		case 14:{
-			printf("En un triángulo rectángulo, los catetos miden 5 y 12 cm, respectivamente. ¿Cuántos cm medirá la hipotenusa?:");
-			break;
-		}	
-		case 15:{
-			printf("Halla el valor del coseno de 0:");
-			break;
-		}	
-		case 16:{
-			printf("Simplifica la siguiente fraccion 24/27:");
-			break;
-		}	
-		case 17:{
-			printf("Si la longitud de la circunferencia es 25 cm, ¿cuántos cm mide su radio?:");
-			break;
-		}	
-		case 18:{
-			printf("Determina el área (cm2) de un triángulo de base 4 cm y altura 7 cm.:");
-			break;
-		}	
-		case 19:{
-			printf("¿Qué número se tiene que restar al cuadrado de 5 para que el resultado sea 10?:");
-			break;
-		}	
-		case 20:{
-			printf("Halla el valor de:9/15=x/5:");
-			break;
-		}		
+	int q,i,dificultad_escogida,NUM_PREGUNTAS,respuesta;
 	
+	
+	system("cls");
+	banner_fijo();
+	printf("\n     =========================================================================\n");
+	printf("\t\t\t     BIENVENIDO A LA MADRIGUERA\n");
+	printf("\t\t  Deberemos resolver preguntas matematicas para asi conseguir\n");
+	printf("\t\t   que nuestro amigo el wombat consiga salir a la superficie\n");
+
+	printf("     =========================================================================\n");
+
+	printf("\n\t\tAqui va todo el contenido del sistema ;)");
+	
+	
+	getchar();
 }
+
+/* Retorna 1 si se registró el usuario en el archivo correctamente */
+char insertarUsuario(Usuario usuario){
+	FILE *archivo;
+	char insercion = 0;
+
+	/* Abre el archivo en modo de añadidura, para agregar datos al final. Si no existe es creado*/
+	archivo = fopen(ARCHIVO_USUARIOS, "ab");
+
+	if (archivo == NULL) {
+		insercion = 0;
+
+	} else {
+		/* Registra el struct usuario en el archivo */
+		fwrite(&usuario, sizeof(usuario), 1, archivo);
+		insercion = 1;
+
+		/* Cierra el archivo */
+		fclose(archivo);
+	}
+
+	return insercion;
+}
+
+/* Retorna 1 si existe el nombre de usuario. Retorna el usuario buscado si existe */
+char existeUsuario(char nombreUsuario[], Usuario* usuario){
+	FILE *archivo;
+	char existe;
+
+	/* Abre el archivo en modo de lectura */
+	archivo = fopen(ARCHIVO_USUARIOS, "rb");
+
+	if (archivo == NULL) {
+		existe = 0;
+
+	} else {
+		existe = 0;
+
+		/* Lee secuencialmente del archivo de usuarios */
+		fread(&(*usuario), sizeof(*usuario), 1, archivo);
+		while (!feof(archivo)) {
+			if (strcmp((*usuario).nombre, nombreUsuario) == 0) {
+				/* Encuentra un usuario del archivo con el nombre de usuario buscado */
+				existe = 1;
+				break;
+			}
+
+			fread(&(*usuario), sizeof(*usuario), 1, archivo);
+		}
+
+		/* Cierra el archivo*/
+		fclose(archivo);
+	}
+
+	return existe;
+}
+
+Usuario *obtenerUsuarios(int *n) {
+	FILE *archivo;
+	Usuario usuario;
+	Usuario *usuarios; /* Vector dinámico de usuarios */
+	int i;
+
+	/* Abre el archivo en modo lectura */
+	archivo = fopen(ARCHIVO_USUARIOS, "rb");
+ 
+	if (archivo == NULL) { /* Si no se pudo abrir el archivo, el valor de archivo es NULL */
+		*n = 0; /* No se pudo abrir. Se considera n = 0 */
+		usuarios = NULL;
+ 
+	} else {
+ 
+		fseek(archivo, 0, SEEK_END); /* Posiciona el cursor al final del archivo */
+		*n = ftell(archivo) / sizeof(Usuario); /* # de usuarios almacenados en el archivo. (# de registros) */
+		usuarios = (Usuario *)malloc((*n) * sizeof(Usuario)); /* Se asigna memoria para todos los usuarios almacenados en el archivo */
+ 
+		/* Se recorre el archivo secuencialmente */
+		fseek(archivo, 0, SEEK_SET); /* Posiciona el cursor al principio del archivo */
+		fread(&usuario, sizeof(usuario), 1, archivo);
+		i = 0;
+		while (!feof(archivo)) {
+			usuarios[i++] = usuario;
+			fread(&usuario, sizeof(usuario), 1, archivo);
+		}
+ 
+		/* Cierra el archivo */
+		fclose(archivo);
+	}
+ 
+	return usuarios;
+}
+
+/* Retorna 1 o 0 si el usuario y password son correctos para un usuario en particular */
+char logear(char nombreUsuario[], char password[]) {
+	FILE *archivo;
+	char logeoExitoso;
+	Usuario usuario;
+
+	/* Abre el archivo en modo de lectura */
+	archivo = fopen(ARCHIVO_USUARIOS, "rb");
+
+	if (archivo == NULL) {
+		logeoExitoso = 0;
+
+	} else {
+		logeoExitoso = 0;
+
+		/* Lee secuencialmente del archivo de usuarios */
+		fread(&usuario, sizeof(usuario), 1, archivo);
+		while (!feof(archivo)) {
+			if (strcmp(usuario.nombre, nombreUsuario) == 0 && strcmp(usuario.password, password) == 0) {
+				/* Encuentra un usuario del archivo con el nombre de usuario y password buscado */
+				logeoExitoso = 1;
+				break;
+			}
+
+			fread(&usuario, sizeof(usuario), 1, archivo);
+		}
+
+		/* Cierra el archivo*/
+		fclose(archivo);
+	}
+
+	return logeoExitoso;
+}
+	
+int leerLinea(char *cad, int n)
+{
+	int i, c;
+
+	/* 1 COMPROBACIÓN DE DATOS INICIALES EN EL BUFFER */
+	c = getchar();
+	if (c == EOF) {
+		cad[0] = '\0';
+		return 0;
+	}
+
+	if (c == '\n') {
+		i = 0;
+	} else {
+		cad[0] = c;
+		i = 1;
+	}
+
+	/* 2. LECTURA DE LA CADENA */
+	for (; i < n - 1 && (c = getchar()) != EOF && c != '\n'; i++) {
+		cad[i] = c;
+	}
+	cad[i] = '\0';
+
+	/*3. LIMPIEZA DEL BUFFER */ 
+	if (c != '\n' && c != EOF) /* es un caracter */
+		while ((c = getchar()) != '\n' && c != EOF);
+ 
+	return 1;
+}
+
+void leerClave(char *password) {
+	char caracter;
+	int i = 0;
+
+	while (caracter = getch()) {
+		if (caracter == TECLA_ENTER) {
+			password[i] = '\0';
+			break;
+			
+		} else if (caracter == TECLA_BACKSPACE) {
+			if (i > 0) {
+				i--;
+				printf("\b \b");
+			}
+			
+		} else {
+			if (i < MAX) {
+				printf("*");
+				password[i] = caracter;
+				i++;
+			}
+		}
+	}
+}
+
+
+void datoswombat(){
+	
+	printf("\n");
+			printf("\n");
+	    	printf("A CERCA DE LOS WOMBAT:\n");
+	    	printf("\n");
+	        printf("El wombat es un animal mamífero endémico de Australia, de contextura musculosa y\n");
+			printf("que pertenece al grupo de los marsupiales. Posee varios rasgos que son únicos y que\n");
+			printf(" lo distinguen de otros tipos de marsupiales, como es el caso de sus particulares\n");
+			printf("dientes, fuertes garras, la forma de sus heces y el metabolismo ralentizado.\n");
+			printf("\n");
+			printf("Su apariencia, con su cuerpo ancho y piernas rechonchas, nos haría pensar que no\n");
+			printf("debe tratarse de un animal muy veloz. Pues, a pesar de las apariencias y este físico\n");
+			printf("tan regordete, los wombats pueden correr hasta 40 km/h en distancias cortas si se\n");
+			printf("sienten bajo amenaza.\n");
+			printf("\n");
+			printf("Entra en wombat.org y ayúdanos a crear un entorno seguro para ellos.\n");		
 }
 
 int respuestas_facil(int numero_pregunta, int respuesta_jugador){
@@ -376,6 +729,92 @@ int respuestas_facil(int numero_pregunta, int respuesta_jugador){
 	return solucion;
 }
 
+void preguntas_facil(int pregunta_actual){
+	
+	switch(pregunta_actual){
+		case 1:{
+			printf("Escribe MMXXVI en números naturales:");
+			break;
+		}
+		case 2:{
+			printf("La raiz de 15625 es:");
+			break;
+		}
+		case 3:{
+			printf("Halla el valor de x=3(14+12-20):(9+3)x:");
+			break;
+		}
+		case 4:{
+			printf("Realiza la siguiente operación: 4/3 - 5/6:");
+			break;
+		}
+		case 5:{
+			printf("¿Cuál de las siguientes es una suma y resta de monomios: 1)2xy-2x+2y, 2) 2+2, 3)3x+4:");
+			break;
+		}	
+		case 6:{
+			printf("Resuelve esta ecuación: (x+28) + 15 = 2(x+15):");
+			break;
+		}	
+		case 7:{
+			printf("Cambia las unidades a m^2: 1005km^2 :");
+			break;
+		}	
+		case 8:{
+			printf("¿Cuántas botellas de vino de un litro de capacidad se pueden llenar con un tonel de un hectolitro?:");
+			break;
+		}	
+		case 9:{
+			printf("El 60% del cuerpo humano es agua. ¿Qué litros de agua hay en una persona de 75 kg?:");
+			break;
+		}	
+		case 10:{
+			printf("Expresa en segundos 2° 3' 40:");
+			break;
+		}	
+		case 11:{
+			printf("Obtén el ángulo el suplementario de 75º:");
+			break;
+		}	
+		case 12:{
+			printf("¿Cuantos lados tiene un hexagono?:");
+			break;
+		}	
+		case 13:{
+			printf("En un triángulo rectángulo, un ángulo mide 30°. ¿Cuánto mide el tercer ángulo?:");
+			break;
+		}	
+		case 14:{
+			printf("En un triángulo rectángulo, los catetos miden 5 y 12 cm, respectivamente. ¿Cuántos cm medirá la hipotenusa?:");
+			break;
+		}	
+		case 15:{
+			printf("Halla el valor del coseno de 0:");
+			break;
+		}	
+		case 16:{
+			printf("Simplifica la siguiente fraccion 24/27:");
+			break;
+		}	
+		case 17:{
+			printf("Si la longitud de la circunferencia es 25 cm, ¿cuántos cm mide su radio?:");
+			break;
+		}	
+		case 18:{
+			printf("Determina el área (cm2) de un triángulo de base 4 cm y altura 7 cm.:");
+			break;
+		}	
+		case 19:{
+			printf("¿Qué número se tiene que restar al cuadrado de 5 para que el resultado sea 10?:");
+			break;
+		}	
+		case 20:{
+			printf("Halla el valor de:9/15=x/5:");
+			break;
+		}		
+	
+}
+}
 
 void preguntas_dificil(int pregunta_actual){
 
@@ -649,219 +1088,7 @@ int respuestas_dificil(int numero_pregunta, int respuesta_jugador){
 			}
 			break;
           }
-		  }
-          
-	
+		  }          		
 	
 	return solucion;
-}
-
-// Main del programa
-	
-int main(){
-	
-	setlocale(LC_CTYPE,"Spanish");//CODIFICAMOS EL IDIOMA A ESPAÑOL PARA PODER UTILIZAR LETRAS COMO LA Ñ DE ESPAÑA
-	
-	system ("color e0");//CODIFICAMOS EL COLOR: AMARILLO PARA EL FONDO Y EL NEGRO PARA LAS LETRAS
-
- 	int num_jugadores=0,i=0,q,zor,opcion2, dificultad_escogida, respuesta;	
-	int longitud1,numero, contador=0, imprimirMenu,opcion,salir_del_juego=0,salir_al_menu, R, U, S;
-	
-	
-	struct jugador PLAYER[4];
-	
-	//Introducimos la funcion que crea el banner
-	// banner();
-		
-	
-	//MENU : REGLAS, REGISTRO ,SALIR
-	
-	zor=1;		//Inicializamos el bucle while
-	
-	while(zor=1){
-		
-	system("cls");
-	banner_fijo();
-	
-	printf("BIENVENIDO AL MENU PRINCIPAL :\n");
-	printf("Escoge entre las distintas opciones que presenta el videojuego\n");
-	printf(" 1 - Para visualizar las reglas del juego\n 2 - Registrate , para a continuacion  jugar\n 3 - Para salir del programa\n");
-	fflush(stdin);
-	scanf("%d", &opcion);
-	system("cls");
-	
-	
-	switch(opcion){
-		case 1: {
-			banner_fijo();
-			reglas();	
-			fflush(stdin);
-			system("pause");
-			system("cls");
-			break;
-		}
-	
-		case 2:{
-			
-			struct jugador PLAYER[4]={{" "," ",0,0,1},{" "," ",0,0,1},{" "," ",0,0,1},{" "," ",0,0,1}};
-			
-			banner_fijo();
-					
-			do{
-		    	printf("Introduce el numero de jugadores, hay posibilidad de que jueguen (solo se puede hasta 4 personas):");
-				scanf("%d", &num_jugadores);
-				
-				if(num_jugadores>0 || num_jugadores < 5){
-					printf("El numero de jugadores debe estar entre uno y cuatro jugadores.\n\n");
-			}
-				
-			}while(num_jugadores<0 || num_jugadores > 5);
-				
-			q++;
-	    	
-			i=0;
-			
-			system("cls");
-			banner_fijo();	
-			// Registro de jugadores
-			for(i=0;i<num_jugadores;i++){
-					
-				printf("Jugador %d Introduzca su nombre de usuario:\n",i+1);
-				fflush(stdin);
-				scanf("%[^\n]s", PLAYER[i].nombre_jugador);
-				printf("\n");
-	
-				printf("Introduce tu contrasena jugador %d \n",i+1);
-				fflush(stdin);
-				scanf("%[^\n]s", PLAYER[i].contrasena_jugador);
-				printf("\n");
-				
-			}
-	
-			system("cls");		//CON ESTO BORRAMOS LO QUE HAY EN LA PANTALLA
-			i=0;
-			// Con esta función indicamos el nivel de dificultad.
-			dificultad_escogida = dificultad();
-			
-			for(i=0;i<num_jugadores;i++){
-				PLAYER[i].dificultad = dificultad_escogida;
-			}
-			system("pause");
-	
-			// INICIAR EL JUEGO AQUI.
-			
-			for(i=0;i<num_jugadores;i++){
-				int j=0, solucionario;
-				
-				if(PLAYER[i].dificultad == 1){
-				// Abrimos aquí la dificultad de fácil.
-					for(j=0;j<NUM_PREGUNTAS;j++){
-						
-						preguntas_facil(PLAYER[i].pregunta_actual);
-						
-						printf("\nRespuesta:");
-						scanf("%d",&respuesta);
-						
-						solucionario = respuestas_facil(PLAYER[i].pregunta_actual, respuesta);
-						if(solucionario == 1){
-							PLAYER[i].puntuacionjugador += 10;
-						}
-						
-						PLAYER[i].pregunta_actual += 1;
-						system("pause");	
-					}
-					
-					if(PLAYER[i].pregunta_actual == 20){
-						printf("\nEs el turno del siguiente jugador.\n\n%cPreparado, jugador %s?", 168, PLAYER[i+1].nombre_jugador);
-					}
-								
-				}else{
-				// Abrimos aquí la dificultad dificil.	
-					if(PLAYER[i].dificultad == 1){
-				
-					for(j=0;j<NUM_PREGUNTAS;j++){
-						
-						preguntas_dificil(PLAYER[i].pregunta_actual);
-						
-						printf("\nRespuesta:");
-						scanf("%d",&respuesta);
-						
-						solucionario = respuestas_dificil(PLAYER[i].pregunta_actual, respuesta);
-						if(solucionario == 1){
-							PLAYER[i].puntuacionjugador += 10;
-						}
-						
-						PLAYER[i].pregunta_actual += 1;
-						system("pause");	
-					}
-					
-					if(PLAYER[i].pregunta_actual == 20){
-						printf("\nEs el turno del siguiente jugador.\n\n%cPreparado, jugador %s?", 168, PLAYER[i+1].nombre_jugador);
-					}	
-					
-				}
-			
-				// Aquí recogemos los datos uno a uno de los jugadores según vayan acabando. Quita el comentario para probar que compila.
-				// recoger_datos(PLAYER[i].nombre_jugador, PLAYER[i].dificultad, PLAYER[i].puntuacionjugador);
-
-				
-			}
-			
-			// Aquí se ha acabado el juego y recogeriamos los datos de los jugadores.
-	
-			zor=0;
-			break;
-				
-		} 
-	case 3 :{
-		banner_fijo();
-		printf("¿Seguro que desea salir del juego?\n");
-		do{
-			printf("Teclea '1' para salir del juego.\n");
-			printf("Teclea '2' para volver al menu del juego.\n");
-			fflush(stdin);
-			scanf("%d", &salir_del_juego);
-			if(salir_del_juego==1){
-				printf("Saliendo del juego...\n");
-				printf("Hasta pronto, les esperamos en su proxima partida de WOMBAT.\n");
-				exit(0);
-					}
-			else if(salir_del_juego==2){
-					printf("Volviendo al menu...\n");
-					zor=1;
-					break;
-			}else{
-				printf("El caracter/numero introducido no es una opcion posible a escoger.\n\n");
-			}
-				
-		}while(salir_del_juego<1 || salir_del_juego > 2);
-		
-		}
-			
-		default:{
-			printf("El numero introducido es erroneo para el programa. Asegurese de que el numero este bien escrito.\n");
-			system("pause");
-			opcion=0;
-			break;
-		}
-	}
-	
-	if(contador>=10) {
-		printf("Enhorabuena, has completado la yincana Wombat\n");
-	} else if (contador<10){
-		printf("Lo sentimos, no has conseguido superar la yincana, ¡prueba otra vez!\n");
-	}
-	
-	
-}
-	
-	
-	system("cls");
-	banner_fijo();
-	dificultad();
-	
-	
-	return 0;
-}
-
 }
